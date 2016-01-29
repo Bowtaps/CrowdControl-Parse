@@ -1,5 +1,5 @@
 /*
-Parse.Cloud.define('addTestGroup', function( request, response){
+parse.Cloud.define('addTestGroup', function( request, response){
     var Group = Parse.Object.extend('Group');
     var relation = Group.relation('Users');
 
@@ -33,6 +33,7 @@ Parse.Cloud.define('addTestGroup', function( request, response){
 /**
  * Fetches updates to a group since the provided timestamp
  */
+/*
 Parse.Cloud.define('fetchGroupUpdates', function(request, response) {
 	
 	// Verify request parameters
@@ -77,4 +78,26 @@ Parse.Cloud.define('fetchGroupUpdates', function(request, response) {
 		response.error('Unable to get group members');
 	});
 	
+});*/
+
+
+Parse.Cloud.define('checkPhonenumber', function(request, response){
+   
+    //var UserObject = Parse.Object.extend('User');
+    var query = new Parse.Query("User");
+    
+    query.equalTo("email", request.params.email);
+    
+    query.find({
+        success: function(results){
+            
+            response.success("email already in system");
+        },
+        
+        error: function() {
+         
+          response.error("email not in database");
+    }
+    });
+    
 });
