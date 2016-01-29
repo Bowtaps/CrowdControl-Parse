@@ -33,7 +33,6 @@ parse.Cloud.define('addTestGroup', function( request, response){
 /**
  * Fetches updates to a group since the provided timestamp
  */
-/*
 Parse.Cloud.define('fetchGroupUpdates', function(request, response) {
 	
 	// Verify request parameters
@@ -48,39 +47,29 @@ Parse.Cloud.define('fetchGroupUpdates', function(request, response) {
 	var resultArray = new Array();
 	
 	// Get group matching given parameters
-	var GroupQuery = new Parse.Query(GroupObject);
+	var GroupQuery = new Parse.Query("Group");
 	GroupQuery.get(group).then(function(groupResult) {
 			
 		// If group has seen an update since then, fetch group members
-		if (groupResult.updatedAt < timestamp) {
+		if (groupResult.updatedAt > timestamp) {
 			resultArray.push(groupResult);
-
-			// Fetch members in relationship
 			var groupMembersRelation = groupResult.relation("GroupMembers");
 			return groupMembersRelation.query().find();
 		} else {
-			response.success(resultArray);
+			return null;
 		}
-	},
-
-	// Handle errors
-	function(error) {
-		response.error('Unable to match group');
 	}).then(function(memberResults) {
 
-		// Add group members to result array and return success
-		resultArray = resultArray.concat(memberResults);
+		// Fetch members in relationship
+		if (memberResults != null) {
+			resultArray = resultArray.concat(memberResults);
+		}
+		
 		response.success(resultArray);
-	},
-
-	// Handle errors
-	function(error) {
-		response.error('Unable to get group members');
 	});
-	
-});*/
+});
 
-
+/*
 Parse.Cloud.define('checkPhonenumber', function(request, response){
    
     //var UserObject = Parse.Object.extend('User');
@@ -101,3 +90,4 @@ Parse.Cloud.define('checkPhonenumber', function(request, response){
     });
     
 });
+*/
