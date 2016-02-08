@@ -91,3 +91,33 @@ Parse.Cloud.define('checkPhonenumber', function(request, response){
     
 });
 */
+
+
+Parse.Cloud.define('fetchGroupInformation', function(request, response) {
+    
+    query.equalTo('user', Parse.User.current() );                                                           
+
+    //find user to CCUser   
+    query.find({
+        success: function(results){
+            
+            //query to find group
+            
+        }
+        
+        error: function(error){
+            response.error('error: finding user in  fetchGroupInformation ');
+        }
+    });
+    
+});
+
+Parse.Cloud.beforeSave('joinGroup', function(request, response) {
+	
+
+});
+
+Parse.Cloud.beforeSave('leaveGroup', function(request, response) {
+	
+
+});
