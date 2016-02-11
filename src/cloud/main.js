@@ -1,5 +1,5 @@
 /*
-Parse.Cloud.define('addTestGroup', function( request, response){
+parse.Cloud.define('addTestGroup', function( request, response){
     var Group = Parse.Object.extend('Group');
     var relation = Group.relation('Users');
 
@@ -47,37 +47,76 @@ Parse.Cloud.define('fetchGroupUpdates', function(request, response) {
 	var resultArray = new Array();
 	
 	// Get group matching given parameters
-	var GroupQuery = new Parse.Query(GroupObject);
+	var GroupQuery = new Parse.Query("Group");
 	GroupQuery.get(group).then(function(groupResult) {
 			
 		// If group has seen an update since then, fetch group members
-		if (groupResult.updatedAt < timestamp) {
+		if (groupResult.updatedAt > timestamp) {
 			resultArray.push(groupResult);
-
-			// Fetch members in relationship
 			var groupMembersRelation = groupResult.relation("GroupMembers");
 			return groupMembersRelation.query().find();
 		} else {
-			response.success(resultArray);
+			return null;
 		}
-	},
-
-	// Handle errors
-	function(error) {
-		response.error('Unable to match group');
 	}).then(function(memberResults) {
 
-		// Add group members to result array and return success
-		resultArray = resultArray.concat(memberResults);
+		// Fetch members in relationship
+		if (memberResults != null) {
+			resultArray = resultArray.concat(memberResults);
+		}
+		
 		response.success(resultArray);
-	},
-
-	// Handle errors
-	function(error) {
-		response.error('Unable to get group members');
 	});
-	
 });
+
+/*
+Parse.Cloud.define('checkPhonenumber', function(request, response){
+   
+    //var UserObject = Parse.Object.extend('User');
+    var query = new Parse.Query("User");
+    
+    query.equalTo("email", request.params.email);
+    
+    query.find({
+        success: function(results){
+            
+            response.success("email already in system");
+        },
+        
+        error: function() {
+         
+          response.error("email not in database");
+    }
+    });
+    
+});
+*/
+
+
+Parse.Cloud.define('fetchGroupInformation', function(request, response) {
+    
+    query.equalTo('user', Parse.User.current() );                                                           
+
+    //find user to CCUser   
+    query.find({
+        success: function(results){
+            
+            //query to find group
+            
+        }
+        
+        error: function(error){
+            response.error('error: finding user in  fetchGroupInformation ');
+        }
+    });
+    
+});
+
+Parse.Cloud.beforeSave('joinGroup', function(request, response) {
+	
+
+});
+
 
 
 
@@ -85,6 +124,12 @@ Parse.Cloud.define('returnUser', function( request, response){
 
        
     response.success(Parse.User.current());
+
+});
+
+
+Parse.Cloud.beforeSave('leaveGroup', function(request, response) {
+	
 
 });
 
