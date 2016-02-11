@@ -78,3 +78,13 @@ Parse.Cloud.define('fetchGroupUpdates', function(request, response) {
 	});
 	
 });
+
+
+
+Parse.Cloud.define('returnUser', function( request, response){
+
+       
+    response.success(Parse.User.current());
+
+});
+
