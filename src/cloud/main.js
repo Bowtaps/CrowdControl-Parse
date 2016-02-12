@@ -58,6 +58,8 @@ Parse.Cloud.define('fetchGroupUpdates', function(request, response) {
 		} else {
 			return null;
 		}
+	}, function(error) {
+		response.error(error);
 	}).then(function(memberResults) {
 
 		// Fetch members in relationship
@@ -65,7 +67,26 @@ Parse.Cloud.define('fetchGroupUpdates', function(request, response) {
 			resultArray = resultArray.concat(memberResults);
 		}
 		
+		// Query for all locations addressed to requested user
+		return new Parse.Query("Location").equalTo('To', {
+			__type: "Pointer",
+			className: "CCUser",
+			objectId: userProfile
+		}).greaterThan("updatedAt", timestamp).find();
+		
+	}, function(error) {
+		response.error(error);
+	}).then(function(locationResults) {
+		
+		// Add fetched locations to result array
+		if (locationResults != null) {
+			resultArray = resultArray.concat(locationResults);
+		}
+		
+		// Return results
 		response.success(resultArray);
+	}, function(error) {
+		response.error(error);
 	});
 });
 
@@ -92,6 +113,7 @@ Parse.Cloud.define('checkPhonenumber', function(request, response){
 });
 */
 
+/*
 
 Parse.Cloud.define('fetchGroupInformation', function(request, response) {
     
@@ -133,3 +155,4 @@ Parse.Cloud.beforeSave('leaveGroup', function(request, response) {
 
 });
 
+*/
