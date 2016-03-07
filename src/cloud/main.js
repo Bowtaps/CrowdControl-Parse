@@ -141,27 +141,34 @@ Parse.Cloud.define('joinGroup', function(request, response) {
 	
     //get params from user
     var group = request.params.group;
-    var userProfile = Parse.User.current();
+    var userProfile = Parse.User.current().get("CCUser");
+    
+    //fetch().then(function (user){
+    //                                                user.get('CCUser');
+    //});
+    
+    
+    console.log( "user uid " + userProfile);
     
     // Construct and execute queries
 	var GroupObject = Parse.Object.extend("Group");
 	//var UserObject = Parse.Object.extend("CCUser");
+    var GroupQuery = new Parse.Query("Group");
     
+    GroupQuery.equalTo("objectId", GroupObject);
     //get group results
-    GroupQuery.get(group).then(function(groupResult) {
-        success: function(_object){
-            //save object
-            object = _object;
-            //create group relation
-            var groupRelation = object.relation("GroupMembers");
-            //save relation
-            groupRelation.add(userProfile);
-        },
-        error: function(error){
-            responce.error("error adding user to group");
-        }
-        
-    }
+    GroupQuery.find({
+        success: function(group){
+            response.success("found group");
+            var relation = group.relation("groupMembers");
+            relation.add(userProfile);
+            group.save();
+            
+        }, error: function() {
+            response.error("failed to find group");
+        }     
+    });
+    
         
 });
 
