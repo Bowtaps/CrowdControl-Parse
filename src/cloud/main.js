@@ -113,41 +113,59 @@ Parse.Cloud.define('checkPhonenumber', function(request, response){
 });
 */
 
-/*
 
 Parse.Cloud.define('fetchGroupInformation', function(request, response) {
     
-    query.equalTo('user', Parse.User.current() );                                                           
+    //set query
+    var query = new Parse.Query("Group");  
+    
+    //perform query
+    //query.equalTp("")
 
-    //find user to CCUser   
     query.find({
         success: function(results){
-            
-            //query to find group
-            
+            response.success();
+        },
+        error: function() {
+            response.error("Fetch Group Information Failed");
         }
         
-        error: function(error){
-            response.error('error: finding user in  fetchGroupInformation ');
-        }
-    });
+    })
+
+
     
 });
 
-Parse.Cloud.beforeSave('joinGroup', function(request, response) {
+Parse.Cloud.define('joinGroup', function(request, response) {
+    Parse.Cloud.useMasterKey();
 	
-
+    //get params from user
+    var group = request.params.group;
+    var userProfile = Parse.User.current();
+    
+    // Construct and execute queries
+	var GroupObject = Parse.Object.extend("Group");
+	//var UserObject = Parse.Object.extend("CCUser");
+    
+    //get group results
+    GroupQuery.get(group).then(function(groupResult) {
+        success: function(_object){
+            //save object
+            object = _object;
+            //create group relation
+            var groupRelation = object.relation("GroupMembers");
+            //save relation
+            groupRelation.add(userProfile);
+        },
+        error: function(error){
+            responce.error("error adding user to group");
+        }
+        
+    }
+        
 });
 
 
-
-
-Parse.Cloud.define('returnUser', function( request, response){
-
-       
-    response.success(Parse.User.current());
-
-});
 
 
 Parse.Cloud.beforeSave('leaveGroup', function(request, response) {
@@ -155,4 +173,4 @@ Parse.Cloud.beforeSave('leaveGroup', function(request, response) {
 
 });
 
-*/
+
