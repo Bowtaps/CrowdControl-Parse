@@ -158,11 +158,13 @@ Parse.Cloud.define('joinGroup', function(request, response) {
     GroupQuery.equalTo("objectId", GroupObject);
     //get group results
     GroupQuery.find({
-        success: function(group){
-            response.success("found group");
-            var relation = group.relation("groupMembers");
+        success: function(groupResults){
+            
+            var relation = groupResults[0].relation("GroupMembers");
             relation.add(userProfile);
-            group.save();
+            groupResults[0].save();
+            
+            response.success("found group");
             
         }, error: function() {
             response.error("failed to find group");
