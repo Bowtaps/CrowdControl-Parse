@@ -164,7 +164,7 @@ Parse.Cloud.define('joinGroup', function(request, response) {
             relation.add(userProfile);
             groupResults[0].save();
             
-            response.success("found group");
+            response.success("found group", groupResults[0]);
             
         }, error: function() {
             response.error("failed to find group");
@@ -178,7 +178,40 @@ Parse.Cloud.define('joinGroup', function(request, response) {
 
 
 Parse.Cloud.beforeSave('leaveGroup', function(request, response) {
+	Parse.Cloud.useMasterKey();
 	
+    //get params from user
+    var group = request.params.group;
+    var userProfile = Parse.User.current().get("CCUser");
+    
+    //fetch().then(function (user){
+    //                                                user.get('CCUser');
+    //});
+    
+    
+    //console.log( "user uid " + userProfile);
+    
+    // Construct and execute queries
+	var GroupObject = Parse.Object.extend("Group");
+	//var UserObject = Parse.Object.extend("CCUser");
+    var GroupQuery = new Parse.Query("Group");
+    
+    GroupQuery.equalTo("objectId", GroupObject);
+    //get group results
+    GroupQuery.find({
+        success: function(groupResults){
+            
+            var relation = groupResults[0].relation("GroupMembers");
+            //remove object
+            relation.remove(userProfile);
+            groupResults[0].save();
+            
+            response.success("found group", groupResults[0]);
+            
+        }, error: function() {
+            response.error("failed to find group");
+        }     
+    });
 
 });
 
