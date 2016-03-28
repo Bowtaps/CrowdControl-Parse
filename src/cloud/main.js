@@ -83,6 +83,17 @@ Parse.Cloud.define('fetchGroupUpdates', function(request, response) {
 			resultArray = resultArray.concat(locationResults);
 		}
 		
+		// Query for all conversatiosn in the group
+		return new Parse.Query("Conversation").equalTo('Group', resultArray[0]).greaterThan("updatedAt", timestamp).find();
+	}, function(error) {
+		response.error(error);
+	}).then(function(conversationResults) {
+		
+		// Add fetched conversations to result array
+		if (conversationResults != null) {
+			resultArray = resultArray.concat(conversationResults);
+		}
+		
 		// Return results
 		response.success(resultArray);
 	}, function(error) {
