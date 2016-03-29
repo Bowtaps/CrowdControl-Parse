@@ -154,17 +154,22 @@ Parse.Cloud.define('joinGroup', function(request, response) {
 	var GroupObject = Parse.Object.extend("Group");
 	//var UserObject = Parse.Object.extend("CCUser");
     var GroupQuery = new Parse.Query("Group");
-    
-    GroupQuery.equalTo("objectId", GroupObject);
+	
     //get group results
-    GroupQuery.find({
-        success: function(groupResults){
-            
-            var relation = groupResults[0].relation("GroupMembers");
-            relation.add(userProfile);
-            groupResults[0].save();
-            
-            response.success("found group", groupResults[0]);
+    GroupQuery.get(group, {
+        success: function(groupResult){
+          	
+			// Found group, add user to it and save
+			var relation = groupResult.relation("GroupMembers");
+			relation.add(userProfile);
+
+			groupResult.save({
+				success: function() {
+					response.success(groupResult)
+				}, error: function() {
+					response.error("failed to join group");
+				}
+			});
             
         }, error: function() {
             response.error("failed to find group");
@@ -177,7 +182,7 @@ Parse.Cloud.define('joinGroup', function(request, response) {
 
 
 
-Parse.Cloud.beforeSave('leaveGroup', function(request, response) {
+Parse.Cloud.define('leaveGroup', function(request, response) {
 	Parse.Cloud.useMasterKey();
 	
     //get params from user
@@ -196,17 +201,21 @@ Parse.Cloud.beforeSave('leaveGroup', function(request, response) {
 	//var UserObject = Parse.Object.extend("CCUser");
     var GroupQuery = new Parse.Query("Group");
     
-    GroupQuery.equalTo("objectId", GroupObject);
     //get group results
-    GroupQuery.find({
-        success: function(groupResults){
+    GroupQuery.get(group, {
+        success: function(groupResult){
             
-            var relation = groupResults[0].relation("GroupMembers");
+            var relation = groupResult.relation("GroupMembers");
             //remove object
             relation.remove(userProfile);
-            groupResults[0].save();
-            
-            response.success("found group", groupResults[0]);
+			
+            groupResult.save({
+				success: function() {
+					response.success(groupResult);
+				}, error: function() {
+					reponse.error("failed to remove user from group", groupResult);
+				}
+			});
             
         }, error: function() {
             response.error("failed to find group");
