@@ -1,35 +1,3 @@
-/*
-parse.Cloud.define('addTestGroup', function( request, response){
-    var Group = Parse.Object.extend('Group');
-    var relation = Group.relation('Users');
-
-    var query = new Parse.Query('Parse.User');
-    
-
-    query.equalTo('User', ParseUser.current())
-    query.limit(10);
-    query.find({
-        sucess: function(results){
-            if(results.length > 0){
-                for( var i = 0; i < results.length; i++)
-                {
-                    var object = results[i];
-                    Group.addUnique('groupMembers', relation);
-                }
-            }
-            else{
-                responce.error('users not avalable');
-            }
-            group.save();
-            
-        },
-        error: function(error){
-        response.error('and error orrcured');
-    }
-    });
-});
-*/
-
 /**
  * Fetches updates to a group since the provided timestamp
  */
@@ -101,51 +69,7 @@ Parse.Cloud.define('fetchGroupUpdates', function(request, response) {
 	});
 });
 
-/*
-Parse.Cloud.define('checkPhonenumber', function(request, response){
-   
-    //var UserObject = Parse.Object.extend('User');
-    var query = new Parse.Query("User");
-    
-    query.equalTo("email", request.params.email);
-    
-    query.find({
-        success: function(results){
-            
-            response.success("email already in system");
-        },
-        
-        error: function() {
-         
-          response.error("email not in database");
-    }
-    });
-    
-});
-*/
 
-
-Parse.Cloud.define('fetchGroupInformation', function(request, response) {
-    
-    //set query
-    var query = new Parse.Query("Group");  
-    
-    //perform query
-    //query.equalTp("")
-
-    query.find({
-        success: function(results){
-            response.success();
-        },
-        error: function() {
-            response.error("Fetch Group Information Failed");
-        }
-        
-    })
-
-
-    
-});
 
 Parse.Cloud.define('joinGroup', function(request, response) {
     Parse.Cloud.useMasterKey();
@@ -192,20 +116,12 @@ Parse.Cloud.define('joinGroup', function(request, response) {
 
 
 
-
 Parse.Cloud.define('leaveGroup', function(request, response) {
 	Parse.Cloud.useMasterKey();
 	
     //get params from user
     var group = request.params.group;
     var userProfile = Parse.User.current().get("CCUser");
-    
-    //fetch().then(function (user){
-    //                                                user.get('CCUser');
-    //});
-    
-    
-    //console.log( "user uid " + userProfile);
     
     // Construct and execute queries
 	var GroupObject = Parse.Object.extend("Group");
@@ -236,3 +152,31 @@ Parse.Cloud.define('leaveGroup', function(request, response) {
 });
 
 
+
+Parse.Cloud.define('fetchNotifications', function(request, response) {
+	
+	// Get current user's profile
+	var userProfile = Parse.User.current().get("CCUser");
+	
+	var resultArray = new Array();
+	
+	// Construct and execute queries
+	var invitationQuery = new Parse.Query("Invitation");
+	invitationQuery.equalTo('Recipient', userProfile);
+	invitationQuery.include('Sender');
+	invitationQuery.include('Group');
+	
+	// Execute query
+	invitationQuery.find().then(function(invitationResult) {
+		
+		// Append fetched invitations to result set
+		if (invitationResult != null) {
+			resultArray.concat(invitationResult);
+		}
+		
+		response.success(resultArray);
+		
+	}, function(error) {
+		response.error(error);
+	});
+});
